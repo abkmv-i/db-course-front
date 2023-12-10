@@ -1,13 +1,14 @@
 # db-course-front
-Установить nodejs:
+**Установить nodejs:**
 https://nodejs.org/en/download/
 
-Установить модули:
+**Установить модули:**
+
 npm install axios
 
 npm install react-select
 
 npm install node-sass
 
-Запустить:
+**Запустить:**
 npm start
