@@ -16,16 +16,23 @@
   color: #61dafb;
 }
 
-.flower {
+.flower, .flower.th{
   border-collapse: collapse;
-  border: 1px solid;
+  border: 1px solid #61dafb;
   width: 100%;
 }
-.add, .delete, .edit{
+
+th, td {
+  border: 1px solid #61dafb;
+  text-align: center;
+  padding: 10px;
+}
+
+.add{
   display: flex;
   width: 250px;
   height: 55px;
-  margin-left: 12.7%;
+  margin-left: 1%;
   margin-bottom: 20px;
   justify-content: center;
   align-items: center;
@@ -34,10 +41,31 @@
   border-radius: 5px;
   border-color: #61dafb;
   font-size: calc(7px + 2vmin);
+  flex-shrink: 0;
 }
-.button{
+.container {
   display: flex;
+  justify-content: space-between; /* Распределяет пространство между элементами */
+  flex-direction: column; /* Устанавливаем направление столбца */
+}
+.cont{
+  display: flex;
+  justify-content: space-between; /* Распределяет пространство между элементами */
+  flex-direction: row; /* Устанавливаем направление столбца */
 }
 
+.grut {
+  margin-left: 2%; /* Расстояние между изображением и таблицей (можете настроить по вашему вкусу) */
+  max-width: 25%; /* Максимальная ширина изображения будет 100% от доступной ширины контейнера */
+  margin-top: 10px;
+  height: auto;
+}
 
+.grut2 {
+  margin-left: 40%; /* Расстояние между изображением и таблицей (можете настроить по вашему вкусу) */
+  margin-right: 30px;
+  max-width: 20%; /* Максимальная ширина изображения будет 100% от доступной ширины контейнера */
+  margin-top: 10px;
+  height: auto;
+}
 

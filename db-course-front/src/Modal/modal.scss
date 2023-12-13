@@ -48,7 +48,7 @@ input, .select_type {
     border-color: var(--primary-color) !important;
   }
 
-  & __value-container {
+  &__value-container {
     padding: 0 !important;
     cursor: text !important;
     color: white !important;
@@ -110,15 +110,18 @@ input, .select_type {
 
 .tableAdd {
   width: 100%;
-  border: 0px solid;
 }
-
+table.tableAdd th,
+table.tableAdd td {
+  border: 0px solid;
+;
+}
 .centerButton {
-  margin-left: 33%;
+  margin-left: 17%;
   display: flex;
   width: 250px;
-  height: 50px;
-  margin-top: 20px;
+  height: 60px;
+  margin-top: 90px;
   margin-bottom: 10px;
   justify-content: center;
   align-items: center;
@@ -128,3 +131,4 @@ input, .select_type {
   border-color: #61dafb;
   font-size: calc(10px + 2vmin);
 }
+

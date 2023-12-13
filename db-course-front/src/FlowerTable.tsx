@@ -5,40 +5,31 @@ import './index.css';
 import ModalAddFlower from "./Modal/modalAddFlower";
 
 interface Flower {
-    id: number;
-    name: string;
-    climate: string;
+    id: string;
+    userId: string;
+    flowerSpecies: string;
     soil: string;
-    water: string;
-    light: string;
-    fertilizer: string;
+    fertilizerType: string;
+    waterType: string;
+    height: string;
+
+}
+interface FlowerParam{
+    id: string;
+    userId: string;
+    soil: string;
+    fertilizerType: string;
+    waterType: string;
 }
 
 let formAdd = document.getElementById('formAdd'),
     buttonAdd = document.getElementById('add'),
     closeAdd = document.getElementById('close');
 
-const optionClimat = [
-    {
-        value: 'equatorial',
-        label: 'Экваториальный'
-    },
-    {
-        value: 'tropical',
-        label: 'Тропический'
-    },
-    {
-        value: 'moderate',
-        label: 'Умеренный'
-    },
-    {
-        value: 'polar',
-        label: 'Полярный'
-    }]
 
 const optionSoil = [
     {
-        value: 'calcareous',
+        value: 'podzolic',
         label: 'Известковая'
     },
     {
@@ -76,20 +67,6 @@ const optionWater = [
         label: 'Соляная'
     }]
 
-const optionLight = [
-    {
-        value: 'solar',
-        label: 'Солнечный'
-    },
-    {
-        value: 'phytolamp',
-        label: 'Фитолампа'
-    },
-    {
-        value: 'led',
-        label: 'Светодиодное'
-    }]
-
 const optionFertilizers = [
     {
         value: 'ammophos',
@@ -106,22 +83,58 @@ const optionFertilizers = [
     {
         value: 'potassium_nitrate',
         label: 'Селитра калийная'
-    }]
+    },
+    {
+        value: 'organic',
+        label: 'Органическое'
+    }
+]
 
 
 const FlowerTable: React.FC = () => {
-    const [id, setId]=useState('');
+    const [id, setId] = useState('');
+    const [userID, setUserID] = useState('');
     const [flowerList, setFlowerList] = useState<Flower[]>([]);
     const [modalActive, setModalActive] = useState(false);
     const [inputName, setInputName] = useState('');
-    const [currentClimat, setClimat] = useState('');
+    const [height, setHeight] = useState('');
     const [currentSoil, setSoil] = useState('');
-    const [currentWater, setWater] = useState();
-    const [currentLight, setLight] = useState();
-    const [currentFertilizers, setFertilizers] = useState();
+    const [currentWater, setWater] = useState('');
+    const [currentFertilizers, setFertilizers] = useState('');
+    const [flowerParamState, setFlowerParamState] = useState<FlowerParam[]>([]);
 
-    const getValueClimat = () => {
-        return currentClimat ? optionClimat.find(c => c.value === currentClimat) : ''
+    const setSoils = (value: string) => {
+        const foundOption = optionSoil.find(c => c.value === value);
+        if (foundOption) {
+            const label = foundOption.label;
+            // Ваш код для использования label
+            return label;
+        }
+        return '';
+    }
+
+    const setWaters = (value: string) => {
+        const foundOption = optionWater.find(c => c.value === value);
+        if (foundOption) {
+            const label = foundOption.label;
+            return label;
+        }
+        return '';
+    }
+
+    const setFertilizer = (value: string) => {
+        const foundOption = optionFertilizers.find(c => c.value === value);
+        if (foundOption) {
+            const label = foundOption.label;
+            return label;
+        }
+        return '';
+    }
+
+
+    const setHeights = (event: string) => {
+        const inputValue = event.replace(/\D/g, '');
+        setHeight(inputValue);
     }
     const getValueSoil = () => {
         return currentSoil ? optionSoil.find(c => c.value === currentSoil) : ''
@@ -130,17 +143,11 @@ const FlowerTable: React.FC = () => {
         return currentWater ? optionWater.find(c => c.value === currentWater) : ''
     }
 
-    const getValueLight = () => {
-        return currentLight ? optionLight.find(c => c.value === currentLight) : ''
-    }
+
     const getValueFertilizers = () => {
         return currentFertilizers ? optionFertilizers.find(c => c.value === currentFertilizers) : ''
     }
 
-    const onChangeClimat = (newValue: any) => {
-        setClimat(newValue.value)
-        setSoil(newValue.value)
-    }
     const onChangeSoil = (newValue: any) => {
         setSoil(newValue.value)
     }
@@ -148,27 +155,27 @@ const FlowerTable: React.FC = () => {
     const onChangeWater = (newValue: any) => {
         setWater(newValue.value)
     }
-    const onChangeLight = (newValue: any) => {
-        setLight(newValue.value)
-    }
+
     const onChangeFertilizers = (newValue: any) => {
         setFertilizers(newValue.value)
+    }
+
+    const comparisonState = () => {
+
     }
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response: AxiosResponse<Flower[]> = await axios.get(
-                    'http://localhost:8080/api/flowers/1/flowers',
+                const response: AxiosResponse<{ flowerList: Flower[] }> = await axios.get(
+                    'http://localhost:8080/api/flowers/{userID}/flowers',
                     {
                         headers: {'Access-Control-Allow-Origin': '*'},
                     }
                 );
-                // handle success
                 console.log(response);
-                setFlowerList(response.data);
+                setFlowerList(response.data.flowerList);
             } catch (error) {
-                // handle error
                 console.error('Error fetching data:', error);
             }
         };
@@ -177,120 +184,181 @@ const FlowerTable: React.FC = () => {
 
     return (
         <div>
-            <h1>Растения</h1>
-            <div className="button">
-                <button className="add" onClick={() => setModalActive(true)}>Добавить</button>
-                <button className="delete">Удалить</button>
-                <button className="edit" onClick={() => setModalActive(true)}>Редактировать</button>
-            </div>
-            <table className="flower">
-                <thead>
-                <tr>
-                    <th>Название</th>
-                    <th>Климат</th>
-                    <th>Почва</th>
-                    <th>Вода</th>
-                    <th>Свет</th>
-                    <th>Удобрение</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {flowerList.map((flower) => (
-                    <tr key={flower.id}>
-                        <td>{flower.name}</td>
-                        <td>{flower.climate}</td>
-                        <td>{flower.soil}</td>
-                        <td>{flower.water}</td>
-                        <td>{flower.light}</td>
-                        <td>{flower.fertilizer}</td>
-                        <td>
-                            <button className="delete">Удалить</button>
-                            <button className="edit" onClick={() => setModalActive(true)}>Редактировать</button>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-
-            <ModalAddFlower active={modalActive} setActive={setModalActive}>
-                <table className="tableAdd">
-                    <tr>
-                        <td>
-                            <p>Название</p>
-                            <input type="text" value={inputName} onChange={(e) => setInputName(e.target.value)}/>
-                        </td>
-                        <td>
-                            <p>Климат</p>
-                            <Select classNamePrefix="select_type" onChange={onChangeClimat} value={getValueClimat()}
-                                    options={optionClimat}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p>Почва</p>
-                            <Select classNamePrefix="select_type" onChange={onChangeSoil} value={getValueSoil()}
-                                    options={optionSoil}/></td>
-                        <td>
-                            <p>Вода</p>
-                            <Select classNamePrefix="select_type" onChange={onChangeWater} value={getValueWater()}
-                                    options={optionWater}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p>Свет</p>
-                            <Select classNamePrefix="select_type" onChange={onChangeLight} value={getValueLight()}
-                                    options={optionLight}/>
-                        </td>
-                        <td>
-                            <p>Удобрения</p>
-                            <Select classNamePrefix="select_type" onChange={onChangeFertilizers} value={getValueFertilizers()}
-                                    options={optionFertilizers}/>
-                        </td>
-                    </tr>
-                </table>
-
-                <button
-                    className="centerButton"
-                    disabled={inputName.length === 0}
-                    type="button"
-                    onClick={async () => {
-                        setId("-1");
-                        console.log(inputName);
-                        //setId((flowerList[flowerList.length - 1].id+1).toString())
-                       try {
-                            await axios({
-                                url: "http://localhost:8080/",
-                                headers: {
-                                    "Content-type": "application/json"
-                                },
-                                params: {
-                                    id, inputName, currentClimat, currentSoil, currentWater, currentLight, currentFertilizers
-                                },
-                                method: "GET",
-                                data: null
-                            }).then(({data}) => {
-                                return data;
-                            });
-                        } catch (e) {
-                            console.log("Sending error", e);
-                        }
+            <div className="container">
+                <div className="cont">
+                    <img className="grut" src={require("./Image/gruti.svg").default} onClick={() => {
                         setInputName('');
-                        onChangeClimat('');
+                        setHeight('')
                         onChangeSoil('');
                         onChangeWater('');
-                        onChangeLight('');
                         onChangeFertilizers('');
-                        setModalActive(false);
-                    }}
-                >
-                    Применить
-                </button>
-            </ModalAddFlower>
+                        setModalActive(true)
+                    }
+                    }/>
+                    <img className="grut2" src={require("./Image/grut2.svg").default} onClick={()=>{
+                        const fetchDataComparasion = async () => {
+                            try {
+                                const response: AxiosResponse<{ flowerStateList: FlowerParam[] }> = await axios.get(
+                                    'http://localhost:8080/api/flowers/{userId}/flowers/check',
+                                    {
+                                        headers: {'Access-Control-Allow-Origin': '*'},
+                                    }
+                                );
+                                setFlowerParamState(response.data.flowerStateList);
+                            } catch (error) {
+                                console.error('Error fetching data:', error);
+                            }
+                        };
+                        fetchDataComparasion();
+                    }
+                    }/>
+
+                </div>
+                <table className="flower">
+                    <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Почва</th>
+                        <th>Вода</th>
+                        <th>Удобрение</th>
+                        <th>Рост</th>
+                        <th>Полив</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {flowerList.map((flower) => (
+                        <tr key={flower.id}>
+                            <td>{flower.flowerSpecies}</td>
+                            <td>{setSoils(flower.soil)}</td>
+                            <td>{setWaters(flower.waterType)}</td>
+                            <td>{setFertilizer(flower.fertilizerType)}</td>
+                            <td>{flower.height}</td>
+                            <td>
+                                <img src={require("./Image/watering.svg").default}/>
+                            </td>
+                            <td>
+                                <img src={require("./Image/edit.svg").default} onClick={() => {
+                                    setModalActive(true);
+                                    setId(flower.id)
+                                    setInputName(flower.flowerSpecies);
+                                    setSoil(flower.soil);
+                                    setWater(flower.waterType);
+                                    setFertilizers(flower.fertilizerType);
+                                    setHeight(flower.height);
+                                }
+                                }/>
+                            </td>
+                            <td>
+                                <img src={require("./Image/delete.svg").default} onClick={async () => {
+                                    setId(flower.id);
+                                    setUserID(flower.userId);
+                                    try {
+                                        const response = await fetch(`http://localhost:8080/del?id=${id}&userID=${userID}`, {
+                                            method: 'DELETE',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            }
+                                        });
+
+                                        if (!response.ok) {
+                                            throw new Error(`HTTP error! Status: ${response.status}`);
+                                        }
+
+                                        const data = await response.json();
+                                        return data;
+                                    } catch (e) {
+                                        console.log('Sending error', e);
+                                    }
+                                }}/>
+                            </td>
+
+
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+
+                <ModalAddFlower active={modalActive} setActive={setModalActive}>
+                    <table className="tableAdd">
+                        <tr>
+                            <td>
+                                <p>Название</p>
+                                <input type="text" value={inputName} onChange={(e) => setInputName(e.target.value)}/>
+                            </td>
+                            <td>
+                                <p>Рост</p>
+                                <input id="height" type="text" value={height} pattern="\d*"
+                                       onChange={(e) => setHeights(e.target.value)}/>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p>Почва</p>
+                                <Select classNamePrefix="select_type" onChange={onChangeSoil} value={getValueSoil()}
+                                        options={optionSoil}/></td>
+                            <td>
+                                <p>Вода</p>
+                                <Select classNamePrefix="select_type" onChange={onChangeWater} value={getValueWater()}
+                                        options={optionWater}/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p>Удобрения</p>
+                                <Select classNamePrefix="select_type" onChange={onChangeFertilizers}
+                                        value={getValueFertilizers()}
+                                        options={optionFertilizers}/>
+                            </td>
+                            <td>
+                                <button
+                                    className="centerButton"
+                                    disabled={inputName.length === 0}
+                                    type="button"
+                                    onClick={async () => {
+                                        setId("-1");
+                                        try {
+                                            const response = await fetch('http://localhost:8080/api/flowers/{userID}/flowers/add', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json'
+                                                },
+                                                body: JSON.stringify({
+                                                    id,
+                                                    flowerSpecies: inputName,
+                                                    soil: currentSoil,
+                                                    waterType: currentWater,
+                                                    fertilizerType: currentFertilizers,
+                                                    height
+                                                })
+                                            });
+
+                                            if (!response.ok) {
+                                                throw new Error(`HTTP error! Status: ${response.status}`);
+                                            }
+
+                                            const data = await response.json();
+                                            console.log(data); // Делайте что-то с полученными данными, если необходимо
+                                        } catch (e) {
+                                            console.log('Sending error', e);
+                                        } finally {
+                                            setInputName('');
+                                            setHeight('');
+                                            onChangeSoil('');
+                                            onChangeWater('');
+                                            onChangeFertilizers('');
+                                            setModalActive(false);
+                                        }
+                                    }}
+                                >
+                                    Применить
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </ModalAddFlower>
+            </div>
         </div>
-
-
     );
 };
 
