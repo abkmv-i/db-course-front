@@ -7,7 +7,7 @@ import {Navigate} from "react-router-dom";
 import {useNavigate} from 'react-router-dom';
 
 
-interface Resources {
+interface userResourcesPage {
     "userId": string,
     "amount": string,
     "type": string,
@@ -55,7 +55,7 @@ const optionSoil = [
         label: 'Известковая'
     },
     {
-        value: 'clayey',
+        value: 'clay',
         label: 'Глинистая'
     },
     {
@@ -150,10 +150,10 @@ const setTypes = (value: string) => {
 }
 const ResourcesTable: React.FC = () => {
     const navigate = useNavigate();
-    const [resourcesList, setResourcesList] = useState<Resources[]>([]);
-    const [waterList, setWaterList] = useState<Resources[]>([]);
-    const [soilList, setSoilsList] = useState<Resources[]>([]);
-    const [fertilizersList, setFertilizersList] = useState<Resources[]>([]);
+    const [resourcesList, setResourcesList] = useState<userResourcesPage[]>([]);
+    const [waterList, setWaterList] = useState<userResourcesPage[]>([]);
+    const [soilList, setSoilsList] = useState<userResourcesPage[]>([]);
+    const [fertilizersList, setFertilizersList] = useState<userResourcesPage[]>([]);
     const [modalActive, setModalActive] = useState(false);
     const [id, setId] = useState("");
     const [amount, setAmount] = useState("");
@@ -161,59 +161,52 @@ const ResourcesTable: React.FC = () => {
     const [type, setType] = useState("");
 
 
-    const parse = () => {
-        setWaterList([]);
-        setSoilsList([]);
-        setFertilizersList([]);
-        resourcesList.map((res, index) => {
-                if (res.type === "water") {
-                    waterList.push(res);
-                } else if (res.type === "soil") {
-                    soilList.push(res);
-                } else {
-                    fertilizersList.push(res);
-                }
-            }
-        )
-        setWaterList(waterList);
-        setSoilsList(soilList);
-        setFertilizersList(fertilizersList);
-    }
-
-    const setFertilizer = (value: string) => {
-        const foundOption = optionFertilizers.find(c => c.value === value);
-        if (foundOption) {
-            const label = foundOption.label;
-            return label;
-        }
-        return '';
-    }
 
     const fetchData = async () => {
+        console.log("------------------------------");
         try {
-            const response: AxiosResponse<{ resourcesList: Resources[] }> = await axios.get(
+            const response: AxiosResponse<{ userResourcesPage: userResourcesPage[] }> = await axios.get(
                 'http://localhost:8080/api/resources/100',
                 {
                     headers: {'Access-Control-Allow-Origin': '*'},
                 }
             );
-            setResourcesList(response.data.resourcesList);
+            setResourcesList(response.data.userResourcesPage
+            );
             setWaterList([]);
             setSoilsList([]);
             setFertilizersList([]);
-            response.data.resourcesList.map((res, index) => {
+            response.data.userResourcesPage.map((res, index) => {
                 if (res.type === "water") {
-                    waterList.push(res);
+                    const foundOption = waterList.findIndex(a => a.resourceType==res.resourceType);
+                    if (foundOption===-1) {
+                        waterList.push(res);
+                    }
+                    else {
+                        waterList[foundOption].amount = res.amount;
+                    }
                 } else if (res.type === "soil") {
-                    soilList.push(res);
+                    const foundOption = soilList.findIndex(a => a.resourceType==res.resourceType);
+                    if (foundOption===-1) {
+                        soilList.push(res);
+                    }
+                    else {
+                        soilList[foundOption].amount = res.amount;
+                    }
                 } else {
-                    fertilizersList.push(res);
+                    const foundOption = fertilizersList.findIndex(a => a.resourceType==res.resourceType);
+                    if (foundOption===-1) {
+                        fertilizersList.push(res);
+                    }
+                    else {
+                        fertilizersList[foundOption].amount = res.amount;
+                    }
                 }
             })
             setWaterList(waterList);
             setSoilsList(soilList);
             setFertilizersList(fertilizersList);
-            console.log(response.data.resourcesList);
+            console.log(response.data.userResourcesPage);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -414,7 +407,6 @@ const ResourcesTable: React.FC = () => {
         </div>
     );
 
-
-    return <Form title="resources" handleClick={parse}/>;
+    return <Form title="resources" handleClick={fetchData}/>;
 };
 export {ResourcesTable};
