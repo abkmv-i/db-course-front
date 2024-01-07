@@ -132,3 +132,18 @@ table.tableAdd td {
   font-size: calc(10px + 2vmin);
 }
 
+
+.but{
+  margin-left: 68%;
+  display: flex;
+  width: 250px;
+  height: 60px;
+  justify-content: center;
+  align-items: center;
+  background: #282c34;
+  color: white;
+  border-radius: 5px;
+  border-color: #61dafb;
+  font-size: calc(10px + 2vmin);
+}
+

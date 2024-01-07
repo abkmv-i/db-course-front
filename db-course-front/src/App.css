@@ -1,27 +1,51 @@
-.App {
+
+
+.body {
+  background-color: #282c34;
+  min-height: 100vh;
+  flex-direction: column;
+  font-size: calc(10px + 2vmin);
+  color: white;
   text-align: center;
+  align-items: center;
 }
 
-
-.App-header {
+.bod {
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   font-size: calc(10px + 2vmin);
   color: white;
+  text-align: center;
+  align-items: center;
 }
 
 .App-link {
   color: #61dafb;
 }
 
-.flower, .flower.th{
+.flower, .flower.th, .flower.td{
+  border-collapse: collapse;
+  border: 1px solid #61dafb;
+  width: 100%;
+}
+.resources{
   border-collapse: collapse;
   border: 1px solid #61dafb;
   width: 100%;
 }
 
+.none{
+  border-collapse: collapse;
+  border: none;
+  width: 100%;
+}
+
+table.none th{
+  border: 0px solid;
+;
+}
 th, td {
   border: 1px solid #61dafb;
   text-align: center;
@@ -30,10 +54,10 @@ th, td {
 
 .add{
   display: flex;
-  width: 250px;
+  width: 200px;
   height: 55px;
-  margin-left: 1%;
-  margin-bottom: 20px;
+  margin-left: 13%;
+  margin-top: 20px;
   justify-content: center;
   align-items: center;
   background: #282c34;
@@ -42,6 +66,14 @@ th, td {
   border-color: #61dafb;
   font-size: calc(7px + 2vmin);
   flex-shrink: 0;
+}
+.inp{
+  height: 55px;
+  margin-left: 0px;
+}
+
+.in{
+  margin-left: 87%;
 }
 .container {
   display: flex;
