@@ -67,6 +67,49 @@ th, td {
   font-size: calc(7px + 2vmin);
   flex-shrink: 0;
 }
+
+.waterShed{
+  display: flex;
+  height: 30px;
+  margin-left: 80px;
+  justify-content: center;
+  align-items: center;
+  background: #282c34;
+  color: white;
+  border-radius: 5px;
+  border-color: #61dafb;
+  font-size: calc(4px + 2vmin);
+  flex-shrink: 0;
+}
+.butRes{
+  display: flex;
+  height: 60px;
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  justify-content: center;
+  align-items: center;
+  background: #282c34;
+  color: white;
+  border-radius: 5px;
+  border-color: #61dafb;
+  font-size: calc(7px + 2vmin);
+  flex-shrink: 0;
+}
+.navigates{
+  display: flex;
+  height: 50px;
+  width: 150px;
+  margin-left: 20px;
+  justify-content: center;
+  align-items: center;
+  background: #282c34;
+  color: white;
+  border-radius: 5px;
+  border-color: #61dafb;
+  font-size: calc(8px + 2vmin);
+  flex-shrink: 0;
+}
 .inp{
   height: 55px;
   margin-left: 0px;

@@ -5,9 +5,7 @@ import {ResourcesTable} from "../components/ResourcesTable";
 
 const ResourcesPage = () => {
     return (
-
             <ResourcesTable />
-
     )
 }
 

@@ -23,11 +23,13 @@ import LoginPage from './pages/LoginPage';
 import './App.css';
 import ResourcesPage from "./pages/ResourcesPage";
 import {Statictic} from "./components/Statictic";
+import FlowerTableAdmin from "./pages/FlowerTableAdmin";
 
 function App() {
     return (
         <Routes>
             <Route path="/home" element={<HomePage />} />
+            <Route path="/homeAdmin" element={<FlowerTableAdmin />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/resurses" element={<ResourcesPage/>} />
             <Route path="/statistic" element={<Statictic/>} />

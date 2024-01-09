@@ -7,29 +7,10 @@ import {Navigate, useNavigate} from "react-router-dom";
 
 
 interface Flower {
-    id: string;
-    userId: string;
     flowerSpecies: string;
     soil: string;
     fertilizerType: string;
     waterType: string;
-    height: string;
-
-}
-
-interface WaterSchedule {
-    id: string;
-    userId: string;
-    "needWater": boolean,
-    "nextWatering": string
-}
-
-interface FlowerParam {
-    id: string;
-    userId: string;
-    soil: boolean;
-    fertilizerType: boolean;
-    waterType: boolean;
 }
 
 
@@ -97,20 +78,14 @@ const optionFertilizers = [
 ]
 
 
-const FlowerTable: React.FC = () => {
+const FlowerTableAdmin: React.FC = () => {
     const navigate = useNavigate();
-    const [id, setId] = useState('');
-    const [userID, setUserID] = useState('');
     const [flowerList, setFlowerList] = useState<Flower[]>([]);
     const [modalActive, setModalActive] = useState(false);
     const [inputName, setInputName] = useState('');
-    const [height, setHeight] = useState('');
     const [currentSoil, setSoil] = useState('');
     const [currentWater, setWater] = useState('');
     const [currentFertilizers, setFertilizers] = useState('');
-    const [flowerParamState, setFlowerParamState] = useState<FlowerParam[]>([]);
-    const [waterSchedule, setWaterSchedule] = useState<WaterSchedule[]>([]);
-    const [ind, setInd] = useState(-1);
 
     const setSoils = (value: string) => {
         const foundOption = optionSoil.find(c => c.value === value);
@@ -141,10 +116,6 @@ const FlowerTable: React.FC = () => {
     }
 
 
-    const setHeights = (event: string) => {
-        const inputValue = event.replace(/\D/g, '');
-        setHeight(inputValue);
-    }
     const getValueSoil = () => {
         return currentSoil ? optionSoil.find(c => c.value === currentSoil) : ''
     }
@@ -169,25 +140,11 @@ const FlowerTable: React.FC = () => {
         setFertilizers(newValue.value)
     }
 
-    const findWaterShed = (value: any, n: any) => {
-        if (flowerList.length != 0) {
-            const foundOption = waterSchedule.findIndex(a => a.id === flowerList[value - 1].id);
-            if (foundOption === -1) {
-                return "";
-            }
-            if (n === 1) {
-                return waterSchedule[foundOption].needWater;
-            } else if (n === 2) {
-                return waterSchedule[foundOption].nextWatering;
-            }
-        }
-    }
-
 
     const fetchData = async () => {
         try {
             const response: AxiosResponse<{ flowerList: Flower[] }> = await axios.get(
-                'http://localhost:8080/api/flowers/100/flowers',
+                'http://localhost:8080/api/admin/best_env',
                 {
                     headers: {'Access-Control-Allow-Origin': '*'},
                 }
@@ -195,15 +152,13 @@ const FlowerTable: React.FC = () => {
             console.log(response);
             setFlowerList(response.data.flowerList);
             response.data.flowerList.map((res, index) => {
-                const foundOption = flowerList.findIndex(a => a.id == res.id);
+                const foundOption = flowerList.findIndex(a => a.flowerSpecies == res.flowerSpecies);
                 if (foundOption === -1) {
                     flowerList.push(res);
                 } else {
-                    flowerList[foundOption].flowerSpecies = res.flowerSpecies;
                     flowerList[foundOption].waterType = res.waterType;
                     flowerList[foundOption].soil = res.soil;
                     flowerList[foundOption].fertilizerType = res.fertilizerType;
-                    flowerList[foundOption].height = res.height;
                 }
                 setFlowerList(flowerList);
             })
@@ -211,59 +166,9 @@ const FlowerTable: React.FC = () => {
             console.error('Error fetching data:', error);
         }
     };
-    const fetchDataComparasion = async () => {
-        try {
-            const response: AxiosResponse<{ isExpected: FlowerParam[] }> = await axios.get(
-                'http://localhost:8080/api/flowers/100/flowers/check',
-                {
-                    headers: {'Access-Control-Allow-Origin': '*'},
-                }
-            );
-            setFlowerParamState(response.data.isExpected);
-            response.data.isExpected.map((res, index) => {
-                const foundOption = flowerParamState.findIndex(a => a.id == res.id);
-                if (foundOption === -1) {
-                    flowerParamState.push(res);
-                } else {
-                    flowerParamState[foundOption].waterType = res.waterType;
-                    flowerParamState[foundOption].soil = res.soil;
-                    flowerParamState[foundOption].fertilizerType = res.fertilizerType;
-                }
-                setFlowerParamState(flowerParamState);
-            })
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
 
-    const fetchWaterShedule = async () => {
-        try {
-            const respons: AxiosResponse<{ waterSchedule: WaterSchedule[] }> = await axios.get(
-                'http://localhost:8080/api/flowers/100/flowers/water',
-                {
-                    headers: {'Access-Control-Allow-Origin': '*'},
-                }
-            );
-            console.log(respons);
-            setWaterSchedule(respons.data.waterSchedule);
-            respons.data.waterSchedule.map((res, index) => {
-                const foundOption = waterSchedule.findIndex(a => a.id == res.id);
-                if (foundOption === -1) {
-                    waterSchedule.push(res);
-                } else {
-                    waterSchedule[foundOption].needWater = res.needWater;
-                    waterSchedule[foundOption].nextWatering = res.nextWatering;
-                }
-                setWaterSchedule(waterSchedule);
-            })
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
     useEffect(() => {
         fetchData()
-        fetchWaterShedule()
-        fetchDataComparasion()
     }, []);
     return (
         <div className="body">
@@ -271,14 +176,20 @@ const FlowerTable: React.FC = () => {
             <button className="navigates"
                     type="button"
                     onClick={async () => {
-                        navigate('/resurses');
+                        navigate('/resursesAdmin');
                     }}>Ресурсы
             </button>
+            <button className="navigates"
+                    type="button"
+                    onClick={async () => {
+                        navigate('/statistic');
+                    }}>Статистика
+            </button>
+
             <div className="container">
                 <div className="cont">
                     <img className="grut" src={require("../Image/gruti.svg").default} onClick={() => {
                         setInputName('');
-                        setHeight('')
                         onChangeSoil('');
                         onChangeWater('');
                         onChangeFertilizers('');
@@ -301,76 +212,34 @@ const FlowerTable: React.FC = () => {
                     <tbody>
                     {
                         flowerList.map((flower, index) => (
-                            <tr key={flower.id}>
+                            <tr key={flower.flowerSpecies}>
                                 <td>{flower.flowerSpecies}</td>
-                                <td style={{color: !flowerParamState[index].soil?'red' : 'white'}}>
-                                    {setSoils(flower.soil)}
-                                </td>
-                                <td style={{color: !flowerParamState[index].waterType ? 'red' : 'white'}}>
-                                    {setWaters(flower.waterType)}</td>
-                                <td style={{color: !flowerParamState[index].fertilizerType ? 'red' : 'white'}}>
-                                    {setFertilizer(flower.fertilizerType)}</td>
-                                <td>{flower.height}</td>
-                                <td>{findWaterShed(flower.id, 2)}
-                                    {findWaterShed(flower.id, 1)}
-                                    {findWaterShed(flower.id, 1) === true ? (
-                                        <button
-                                            className="waterShed"
-                                            type="button"
-                                            onClick={async () => {
-                                                try {
-                                                    const response = await fetch(`http://localhost:8080/api/flowers/100/flowers/water/flowers?flowerId=${flower.id}`, {
-                                                        method: 'GET',
-                                                        headers: {
-                                                            'Content-Type': 'application/json'
-                                                        }
-                                                    });
-                                                    if (response.ok) {
-                                                        fetchWaterShedule();
-                                                    } else {
-                                                        throw new Error(`HTTP error! Status: ${response.status}`);
-                                                    }
+                                <td>{setSoils(flower.soil)}</td>
+                                <td>{setWaters(flower.waterType)}</td>
+                                <td>{setFertilizer(flower.fertilizerType)}</td>
 
-                                                } catch (e) {
-                                                    console.log('Sending error', e);
-                                                }
-                                            }}
-                                        >
-                                            Полить
-                                        </button>
-                                    ) : (
-                                        <p></p>
-                                    )}
-                                </td>
                                 <td>
                                     <img src={require("../Image/edit.svg").default} onClick={() => {
                                         setModalActive(true);
-                                        setId(flower.id)
                                         setInputName(flower.flowerSpecies);
                                         setSoil(flower.soil);
                                         setWater(flower.waterType);
                                         setFertilizers(flower.fertilizerType);
-                                        setHeight(flower.height);
-                                        setInd(index);
                                     }
                                     }/>
                                 </td>
                                 <td>
                                     <img src={require("../Image/delete.svg").default} onClick={async () => {
-                                        setId(flower.id);
-                                        setUserID(flower.userId);
                                         try {
-                                            const response = await fetch(`http://localhost:8080/api/flowers/100/flowers?flowerId=${flower.id}`, {
+                                            const response = await fetch(`http://localhost:8080/api/admin/best_env/flowers?flowerSpecies=${flower.flowerSpecies}`, {
                                                 method: 'DELETE',
                                                 headers: {
                                                     'Content-Type': 'application/json'
                                                 }
                                             });
-
                                             if (response.ok) {
                                                 delete flowerList[index];
                                                 fetchData();
-                                                fetchDataComparasion();
                                             } else {
                                                 throw new Error(`HTTP error! Status: ${response.status}`);
                                             }
@@ -393,11 +262,6 @@ const FlowerTable: React.FC = () => {
                             <td>
                                 <p>Название</p>
                                 <input type="text" value={inputName} onChange={(e) => setInputName(e.target.value)}/>
-                            </td>
-                            <td>
-                                <p>Рост</p>
-                                <input id="height" type="text" value={height} pattern="\d*"
-                                       onChange={(e) => setHeights(e.target.value)}/>
                             </td>
                         </tr>
                         <tr>
@@ -424,26 +288,21 @@ const FlowerTable: React.FC = () => {
                                     disabled={inputName.length === 0}
                                     type="button"
                                     onClick={async () => {
-                                        setId((flowerList.length + 1).toString());
                                         try {
-                                            const response = await fetch('http://localhost:8080/api/flowers/100/flowers/add', {
+                                            const response = await fetch('http://localhost:8080/api/admin/best_env/add', {
                                                 method: 'POST',
                                                 headers: {
                                                     'Content-Type': 'application/json'
                                                 },
                                                 body: JSON.stringify({
-                                                    id,
                                                     flowerSpecies: inputName,
                                                     soil: currentSoil,
                                                     waterType: currentWater,
                                                     fertilizerType: currentFertilizers,
-                                                    height
                                                 })
                                             });
                                             if (response.ok) {
                                                 fetchData();
-                                                fetchWaterShedule();
-                                                fetchDataComparasion();
                                             } else {
                                                 throw new Error(`HTTP error! Status: ${response.status}`);
                                             }
@@ -454,7 +313,6 @@ const FlowerTable: React.FC = () => {
                                             console.log('Sending error', e);
                                         } finally {
                                             setInputName('');
-                                            setHeight('');
                                             onChangeSoil('');
                                             onChangeWater('');
                                             onChangeFertilizers('');
@@ -475,4 +333,4 @@ const FlowerTable: React.FC = () => {
 
 };
 
-export default FlowerTable;
+export default FlowerTableAdmin;

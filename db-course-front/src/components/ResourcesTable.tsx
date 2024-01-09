@@ -3,8 +3,7 @@ import axios, {AxiosResponse} from 'axios';
 import '../App.css';
 import {Form} from "../components/Form";
 import ModalAddFlower from "../Modal/modalAddFlower";
-import {Navigate} from "react-router-dom";
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from "react-router-dom";
 
 
 interface userResourcesPage {
@@ -24,8 +23,8 @@ const typeResources = [
         label: 'Почва'
     },
     {
-        value: 'fertilizers',
-        label: 'Удобрения'
+        value: 'fertilizer',
+        label: 'Удобрение'
     }
 ]
 const optionWater = [
@@ -151,6 +150,7 @@ const setTypes = (value: string) => {
 const ResourcesTable: React.FC = () => {
     const navigate = useNavigate();
     const [resourcesList, setResourcesList] = useState<userResourcesPage[]>([]);
+    const [bestResources, setBestResourcesList] = useState<userResourcesPage[]>([]);
     const [waterList, setWaterList] = useState<userResourcesPage[]>([]);
     const [soilList, setSoilsList] = useState<userResourcesPage[]>([]);
     const [fertilizersList, setFertilizersList] = useState<userResourcesPage[]>([]);
@@ -159,11 +159,10 @@ const ResourcesTable: React.FC = () => {
     const [amount, setAmount] = useState("");
     const [resourceType, setResourceType] = useState("");
     const [type, setType] = useState("");
-
+    const [triger, setTriger] = useState(false);
 
 
     const fetchData = async () => {
-        console.log("------------------------------");
         try {
             const response: AxiosResponse<{ userResourcesPage: userResourcesPage[] }> = await axios.get(
                 'http://localhost:8080/api/resources/100',
@@ -178,27 +177,24 @@ const ResourcesTable: React.FC = () => {
             setFertilizersList([]);
             response.data.userResourcesPage.map((res, index) => {
                 if (res.type === "water") {
-                    const foundOption = waterList.findIndex(a => a.resourceType==res.resourceType);
-                    if (foundOption===-1) {
+                    const foundOption = waterList.findIndex(a => a.resourceType == res.resourceType);
+                    if (foundOption === -1) {
                         waterList.push(res);
-                    }
-                    else {
+                    } else {
                         waterList[foundOption].amount = res.amount;
                     }
                 } else if (res.type === "soil") {
-                    const foundOption = soilList.findIndex(a => a.resourceType==res.resourceType);
-                    if (foundOption===-1) {
+                    const foundOption = soilList.findIndex(a => a.resourceType == res.resourceType);
+                    if (foundOption === -1) {
                         soilList.push(res);
-                    }
-                    else {
+                    } else {
                         soilList[foundOption].amount = res.amount;
                     }
                 } else {
-                    const foundOption = fertilizersList.findIndex(a => a.resourceType==res.resourceType);
-                    if (foundOption===-1) {
+                    const foundOption = fertilizersList.findIndex(a => a.resourceType == res.resourceType);
+                    if (foundOption === -1) {
                         fertilizersList.push(res);
-                    }
-                    else {
+                    } else {
                         fertilizersList[foundOption].amount = res.amount;
                     }
                 }
@@ -211,24 +207,44 @@ const ResourcesTable: React.FC = () => {
             console.error('Error fetching data:', error);
         }
     };
+    const fetchBestData = async () => {
+        try {
+            const response: AxiosResponse<{ userResourcesPage: userResourcesPage[] }> = await axios.get(
+                'http://localhost:8080/api/resources/100/best_environment',
+                {
+                    headers: {'Access-Control-Allow-Origin': '*'},
+                }
+            );
+            setBestResourcesList(response.data.userResourcesPage);
+
+            response.data.userResourcesPage.map((res, index) => {
+
+                const foundOption = bestResources.findIndex(a => a.resourceType == res.resourceType);
+                if (foundOption === -1) {
+                    bestResources.push(res);
+                } else {
+                    bestResources[foundOption].amount = res.amount;
+                }
+            })
+            setBestResourcesList(bestResources);
+            console.log(response.data.userResourcesPage);
+        } catch (error) {
+
+        }
+    }
 
     useEffect(() => {
         fetchData()
     }, []);
     return (
         <div className="body">
-            <h4 onClick={()=> {
-                navigate('/home');
-            }
-            }>Цветы</h4>
-            <h4 onClick={()=> {
-                navigate('/resurses');
-            }
-            }>Ресурсы</h4>
-            <h4 onClick={()=> {
-                navigate('/statistic');
-            }
-            }>Cтатистика</h4>
+            <br/>
+            <button className="navigates"
+                    type="button"
+                    onClick={async () => {
+                        navigate('/home');
+                    }}>Цветы
+            </button>
             <h1>Ресурсы</h1>
             <table className="none">
                 <tr>
@@ -334,7 +350,7 @@ const ResourcesTable: React.FC = () => {
                                         <td>
                                             <img src={require("../Image/edit.svg").default} onClick={() => {
                                                 setModalActive(true);
-                                                setType("fertilizers");
+                                                setType("fertilizer");
                                                 setResourceType(fertilizers.resourceType);
                                                 setAmount(fertilizers.amount);
                                                 setId(fertilizers.userId);
@@ -347,6 +363,44 @@ const ResourcesTable: React.FC = () => {
                         </table>
                     </td>
                 </tr>
+                <button
+                    className="butRes"
+
+                    type="button"
+                    onClick={async () => {
+                        fetchBestData();
+                        setTriger(true);
+                    }}
+                >
+                    Показать недостающие русурсы
+                </button>
+                {triger? (
+                    <table className="resources">
+                        <thead>
+                        <tr>
+                            <th>
+                                Название
+                            </th>
+                            <th>
+                                Количество
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {
+                            bestResources.map((type) => (
+                                <tr key={type.type}>
+                                    <td>{setSoils(type.resourceType)}{setWaters(type.resourceType)}{setFertilizer(type.resourceType)} {setTypes(type.type)}</td>
+
+                                    <td>{type.amount}</td>
+                                </tr>
+                            ))}
+
+                        </tbody>
+                    </table>
+                ) : (
+                    <p></p>
+                )}
             </table>
 
             <ModalAddFlower active={modalActive} setActive={setModalActive}>
@@ -385,6 +439,7 @@ const ResourcesTable: React.FC = () => {
                                     });
                                     if (response.ok) {
                                         fetchData();
+                                        fetchBestData();
                                     } else {
                                         throw new Error(`HTTP error! Status: ${response.status}`);
                                     }

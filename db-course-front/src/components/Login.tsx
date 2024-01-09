@@ -30,9 +30,12 @@ const Login = () => {
 
             if (response.ok) {
 
-                if (user.userId === 1 || user.userId === 2 || user.userId === null) {
+                if (user.userId === 2 || user.userId === null) {
 
                     navigate('/home');
+                }
+                else if(user.userId === 1){
+                    navigate('/homeAdmin');
                 }
                 console.log(user);
             } else {
