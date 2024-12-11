@@ -12,7 +12,7 @@ const Form: FC<FormProps> = ({title, handleClick}) => {
 
     return (
             <div>
-                <h1>Login</h1>
+                <h2>Login</h2>
                 <input className="inp"
                     type="email"
                     value={email}
